@@ -1,9 +1,9 @@
-# com-chilipeppr-widget-grbl
-This widget shows the GRBL Buffer so other widgets can limit their flow of sending commands and other specific GRBL features.
+# com-chilipeppr-elem-dragdrop
+An element that presents a drag and drop icon that allows files to be dragged onto it. A pubsub event called /com-chilipeppr-elem-dragdrop/ondropped is published when the drop is complete. The contents of the file are passed in the pubsub call so different widgets/elements can consume the contents of the file.
 
 ![alt text](screenshot.png "Screenshot")
 
-## ChiliPeppr Widget / GRBL
+## ChiliPeppr Element / Drag Drop
 
 All ChiliPeppr widgets/elements are defined using cpdefine() which is a method
 that mimics require.js. Each defined object must have a unique ID so it does
@@ -11,13 +11,13 @@ not conflict with other ChiliPeppr widgets.
 
 | Item                  | Value           |
 | -------------         | ------------- | 
-| ID                    | com-chilipeppr-widget-grbl |
-| Name                  | Widget / GRBL |
-| Description           | This widget shows the GRBL Buffer so other widgets can limit their flow of sending commands and other specific GRBL features. |
-| chilipeppr.load() URL | http://raw.githubusercontent.com/jpadie/grbl1-test-widget/master/auto-generated-widget.html |
-| Edit URL              | http://ide.c9.io/jpadie/grbl1_1_test |
-| Github URL            | http://github.com/jpadie/grbl1-test-widget |
-| Test URL              | https://preview.c9users.io/jpadie/grbl1_1_test/widget.html |
+| ID                    | com-chilipeppr-elem-dragdrop |
+| Name                  | Element / Drag Drop |
+| Description           | An element that presents a drag and drop icon that allows files to be dragged onto it. A pubsub event called /com-chilipeppr-elem-dragdrop/ondropped is published when the drop is complete. The contents of the file are passed in the pubsub call so different widgets/elements can consume the contents of the file. |
+| chilipeppr.load() URL | http://raw.githubusercontent.com/jpadie/slimGrblPanel/master/auto-generated-widget.html |
+| Edit URL              | http://ide.c9.io/jpadie/slimgrblpanel |
+| Github URL            | http://github.com/jpadie/slimGrblPanel |
+| Test URL              | https://preview.c9users.io/jpadie/slimgrblpanel/widget.html |
 
 ## Example Code for chilipeppr.load() Statement
 
@@ -29,20 +29,20 @@ back the instance of it.
 
 ```javascript
 // Inject new div to contain widget or use an existing div with an ID
-$("body").append('<' + 'div id="myDivWidgetGrbl"><' + '/div>');
+$("body").append('<' + 'div id="myDivElemDragdrop"><' + '/div>');
 
 chilipeppr.load(
-  "#myDivWidgetGrbl",
-  "http://raw.githubusercontent.com/jpadie/grbl1-test-widget/master/auto-generated-widget.html",
+  "#myDivElemDragdrop",
+  "http://raw.githubusercontent.com/jpadie/slimGrblPanel/master/auto-generated-widget.html",
   function() {
-    // Callback after widget loaded into #myDivWidgetGrbl
+    // Callback after widget loaded into #myDivElemDragdrop
     // Now use require.js to get reference to instantiated widget
     cprequire(
-      ["inline:com-chilipeppr-widget-grbl"], // the id you gave your widget
-      function(myObjWidgetGrbl) {
+      ["inline:com-chilipeppr-elem-dragdrop"], // the id you gave your widget
+      function(myObjElemDragdrop) {
         // Callback that is passed reference to the newly loaded widget
-        console.log("Widget / GRBL just got loaded.", myObjWidgetGrbl);
-        myObjWidgetGrbl.init();
+        console.log("Element / Drag Drop just got loaded.", myObjElemDragdrop);
+        myObjElemDragdrop.init();
       }
     );
   }
@@ -64,7 +64,7 @@ To better understand how ChiliPeppr's subscribe() method works see amplify.js's 
           </tr>
       </thead>
       <tbody>
-      <tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-interface-cnccontroller/feedhold</td><td>Feedhold (Emergency Stop). This signal is published when user hits the Feedhold button for an emergency stop of the GRBL. Other widgets should see this and stop sending all commands such that even when the plannerresume signal is received when the user clears the queue or cycle starts again, they have to manually start sending code again. So, for example, a Gcode sender widget should place a pause on the sending but allow user to unpause.</td></tr><tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-interface-cnccontroller/plannerpause</td><td>This widget will publish this signal when it determines that the planner buffer is too full on the GRBL and all other elements/widgets need to stop sending data. You will be sent a /plannerresume when this widget determines you can start sending again. The GRBL has a buffer of 28 slots for data. You want to fill it up with around 12 commands to give the planner enough data to work on for optimizing velocities of movement. However, you can't overfill the GRBL or it will go nuts with buffer overflows. This signal helps you fire off your data and not worry about it, but simply pause the sending of the data when you see this signal. This signal does rely on the GRBL being in {qv:2} mode which means it will auto-send us a report on the planner every time it changes. This widget watches for those changes to generate the signal. The default setting is when we hit 12 remaining planner buffer slots we will publish this signal.</td></tr><tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-interface-cnccontroller/plannerresume</td><td>This widget will send this signal when it is ok to send data to the GRBL again. This widget watches the {qr:[val]} status report from the GRBL to determine when the planner buffer has enough room in it to send more data. You may not always get a 1 to 1 /plannerresume for every /plannerpause sent because we will keep sending /plannerpause signals if we're below threshold, but once back above threshold we'll only send you one /plannerresume. The default setting is to send this signal when we get back to 16 available planner buffer slots.</td></tr><tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-interface-cnccontroller/axes</td><td>This widget will normalize the GRBL status report of axis coordinates to send off to other widgets like the XYZ widget. The axes publish payload contains {x:float, y:float, z:float, a:float} If a different CNC controller is implemented, it should normalize the coordinate status reports like this model. The goal of this is to abstract away the specific controller implementation from generic CNC widgets.</td></tr><tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-interface-cnccontroller/units</td><td>This widget will normalize the GRBL units to the interface object of units {units: "mm"} or {units: "inch"}. This signal will be published on load or when this widget detects a change in units so other widgets like the XYZ widget can display the units for the coordinates it is displaying.</td></tr><tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-interface-cnccontroller/proberesponse</td><td>Publish a probe response with the coordinates triggered during probing, or an alarm state if the probe does not contact a surface</td></tr><tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-interface-cnccontroller/status</td><td>Publish a signal each time the GRBL status changes</td></tr>    
+      <tr valign="top"><td>/com-chilipeppr-elem-dragdrop/com-chilipeppr-elem-dragdrop/ondropped</td><td>When the file is dropped. Payload contains the file.</td></tr><tr valign="top"><td>/com-chilipeppr-elem-dragdrop/com-chilipeppr-elem-dragdrop/ondragover</td><td>When the mouse is hovering over drop area so you can hilite/react. Empty payload.</td></tr><tr valign="top"><td>/com-chilipeppr-elem-dragdrop/com-chilipeppr-elem-dragdrop/ondragleave</td><td>When mouse stops hovering so you can remove hilites. Empty payload.</td></tr><tr valign="top"><td>/com-chilipeppr-elem-dragdrop/com-chilipeppr-elem-dragdrop/ondragdone</td><td>When user drops the file onto browser so you can remove hilites. Empty payload. Don't confuse this with ondropped which is the pubsub that actually contains file that was dropped.</td></tr>    
       </tbody>
   </table>
 
@@ -81,7 +81,7 @@ To better understand how ChiliPeppr's publish() method works see amplify.js's do
           </tr>
       </thead>
       <tbody>
-      <tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-interface-cnccontroller/jogdone</td><td>We subscribe to a jogdone event so that we can fire off an exclamation point (!) to the GRBL to force it to drop all planner buffer items to stop the jog immediately.</td></tr><tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-interface-cnccontroller/recvgcode</td><td>Subscribe to receive gcode from other widgets for processing and passing on to serial port</td></tr>    
+      <tr valign="top"><td>/com-chilipeppr-elem-dragdrop/com-chilipeppr-elem-dragdrop/loadGcode</td><td>Send in this signal to load a string of Gcode with a payload of: { gcode: "your gcode text as a string", name: "name of file as string so the recent file list can show the name", lastModified: Date }. This signal will then generate an onDropped signal which is what all widgets listen to for loading of the file.</td></tr><tr valign="top"><td>/com-chilipeppr-elem-dragdrop/com-chilipeppr-elem-dragdrop/loadGcodeDoNotCreateRecentFileEntry</td><td>Send in this signal to load a string of Gcode without creating a recent file menu entry. Send in the same payload as /loadGcode. This is useful if you have a macro or a widget that wants to send a lot of Gcode into ChiliPeppr over and over, but does not want to bloat the recent file menu. For example, the Auto-Leveller may want to let the user load Gcode over and over without creating a history.</td></tr><tr valign="top"><td>/com-chilipeppr-elem-dragdrop/com-chilipeppr-elem-dragdrop/loadGcodeFromUrl</td><td>Send in this signal to load Gcode from a URL. The payload is simply the URL as a string.</td></tr><tr valign="top"><td>/com-chilipeppr-elem-dragdrop/com-chilipeppr-elem-dragdrop/loadGcodeFromUrlDoNotCreateRecentFileEntry</td><td>Send in this signal to load Gcode from a URL, but do not create a recent file entry in the process. This allows you to load Gcode over and over without bloating the recent file menu.</td></tr>    
       </tbody>
   </table>
 
@@ -98,7 +98,7 @@ To better understand how ChiliPeppr's subscribe() method works see amplify.js's 
           </tr>
       </thead>
       <tbody>
-      <tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-widget-serialport/send</td><td>We send to the serial port certain commands like the initial configuration commands for the GRBL to be in the correct mode and to get initial statuses like planner buffers and XYZ coords. We also send the Emergency Stop and Resume of ! and ~</td></tr>    
+      <tr><td colspan="2">(No signals defined in this widget/element)</td></tr>    
       </tbody>
   </table>
 
@@ -115,7 +115,7 @@ To better understand how ChiliPeppr's publish() method works see amplify.js's do
           </tr>
       </thead>
       <tbody>
-      <tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-widget-serialport/ws/onconnect</td><td>When we see a new connect, query for status.</td></tr><tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-widget-serialport/recvline</td><td>When we get a dataline from serialport, process it and fire off generic CNC controller signals to the /com-chilipeppr-interface-cnccontroller channel.</td></tr><tr valign="top"><td>/com-chilipeppr-widget-grbl/com-chilipeppr-widget-serialport/send</td><td>Subscribe to serial send and override so no other subscriptions receive command.</td></tr>    
+      <tr><td colspan="2">(No signals defined in this widget/element)</td></tr>    
       </tbody>
   </table>
 
@@ -132,7 +132,7 @@ The table below shows, in order, the methods and properties inside the widget/el
           </tr>
       </thead>
       <tbody>
-      <tr valign="top"><td>id</td><td>string</td><td>"com-chilipeppr-widget-grbl"</td></tr><tr valign="top"><td>implements</td><td>object</td><td></td></tr><tr valign="top"><td>url</td><td>string</td><td>"http://fiddle.jshell.net/jarret/b5L2rtgc/show/light/"</td></tr><tr valign="top"><td>fiddleurl</td><td>string</td><td>"http://jsfiddle.net/jarret/b5L2rtgc/"</td></tr><tr valign="top"><td>name</td><td>string</td><td>"Widget / GRBL"</td></tr><tr valign="top"><td>desc</td><td>string</td><td>"This widget shows the GRBL Buffer so other widgets can limit their flow of sending commands and other specific GRBL features."</td></tr><tr valign="top"><td>publish</td><td>object</td><td>Please see docs above.</td></tr><tr valign="top"><td>subscribe</td><td>object</td><td>Please see docs above.</td></tr><tr valign="top"><td>foreignPublish</td><td>object</td><td>Please see docs above.</td></tr><tr valign="top"><td>foreignSubscribe</td><td>object</td><td>Please see docs above.</td></tr><tr valign="top"><td>config</td><td>object</td><td></td></tr><tr valign="top"><td>compileOptions</td><td>string</td><td></td></tr><tr valign="top"><td>buffer_name</td><td>string</td><td></td></tr><tr valign="top"><td>report_mode</td><td>number</td><td></td></tr><tr valign="top"><td>work_mode</td><td>number</td><td></td></tr><tr valign="top"><td>status</td><td>string</td><td>"Offline"</td></tr><tr valign="top"><td>version</td><td>string</td><td></td></tr><tr valign="top"><td>offsets</td><td>object</td><td></td></tr><tr valign="top"><td>last_work</td><td>object</td><td></td></tr><tr valign="top"><td>last_machine</td><td>object</td><td></td></tr><tr valign="top"><td>init</td><td>function</td><td>function () </td></tr><tr valign="top"><td>options</td><td>object</td><td></td></tr><tr valign="top"><td>setupUiFromCookie</td><td>function</td><td>function () </td></tr><tr valign="top"><td>saveOptionsCookie</td><td>function</td><td>function () </td></tr><tr valign="top"><td>showBody</td><td>function</td><td>function (evt) </td></tr><tr valign="top"><td>hideBody</td><td>function</td><td>function (evt) </td></tr><tr valign="top"><td>btnSetup</td><td>function</td><td>function () </td></tr><tr valign="top"><td>showConfigModal</td><td>function</td><td>function () </td></tr><tr valign="top"><td>hideConfigModal</td><td>function</td><td>function () </td></tr><tr valign="top"><td>saveConfigModal</td><td>function</td><td>function () </td></tr><tr valign="top"><td>updateWorkUnits</td><td>function</td><td>function (units)</td></tr><tr valign="top"><td>updateReportUnits</td><td>function</td><td>function ()</td></tr><tr valign="top"><td>openController</td><td>function</td><td>function (isWithDelay) </td></tr><tr valign="top"><td>closeController</td><td>function</td><td>function (isWithDelay) </td></tr><tr valign="top"><td>grblResponseV1</td><td>function</td><td>function (recvline)</td></tr><tr valign="top"><td>grblResponse</td><td>function</td><td>function (recvline) </td></tr><tr valign="top"><td>sendCode</td><td>function</td><td>function (sendline)</td></tr><tr valign="top"><td>lastUnits</td><td>string</td><td>"mm"</td></tr><tr valign="top"><td>isShowingStats</td><td>boolean</td><td></td></tr><tr valign="top"><td>publishAxisStatus</td><td>function</td><td>function (sr) </td></tr><tr valign="top"><td>plannerLastEvent</td><td>string</td><td>"resume"</td></tr><tr valign="top"><td>publishPlannerPause</td><td>function</td><td>function () </td></tr><tr valign="top"><td>publishPlannerResume</td><td>function</td><td>function () </td></tr><tr valign="top"><td>toInch</td><td>function</td><td>function (mm)</td></tr><tr valign="top"><td>toMM</td><td>function</td><td>function (inch)</td></tr><tr valign="top"><td>forkSetup</td><td>function</td><td>function () </td></tr>
+      <tr valign="top"><td>id</td><td>string</td><td>"com-chilipeppr-elem-dragdrop"</td></tr><tr valign="top"><td>url</td><td>string</td><td>"http://fiddle.jshell.net/chilipeppr/Z9F6G/show/light/"</td></tr><tr valign="top"><td>fiddleurl</td><td>string</td><td>"http://jsfiddle.net/chilipeppr/Z9F6G/"</td></tr><tr valign="top"><td>name</td><td>string</td><td>"Element / Drag Drop"</td></tr><tr valign="top"><td>desc</td><td>string</td><td>"An element that presents a drag and drop icon that allows files to be dragged onto it. A pubsub event called /com-chilipeppr-elem-dragdrop/ondropped is published when the drop is complete. The contents of the file are passed in the pubsub call so different widgets/elements can consume the contents of the file."</td></tr><tr valign="top"><td>publish</td><td>object</td><td>Please see docs above.</td></tr><tr valign="top"><td>subscribe</td><td>object</td><td>Please see docs above.</td></tr><tr valign="top"><td>hasHtml</td><td>boolean</td><td></td></tr><tr valign="top"><td>hasCss</td><td>boolean</td><td></td></tr><tr valign="top"><td>hasJs</td><td>boolean</td><td></td></tr><tr valign="top"><td>dropArea</td><td>object</td><td></td></tr><tr valign="top"><td>txtDomElemSelector</td><td>object</td><td></td></tr><tr valign="top"><td>init</td><td>function</td><td>function () </td></tr><tr valign="top"><td>setupDownload</td><td>function</td><td>function () </td></tr><tr valign="top"><td>onDownload</td><td>function</td><td>function (evt) </td></tr><tr valign="top"><td>setupSubscribe</td><td>function</td><td>function () </td></tr><tr valign="top"><td>loadGcodeFromUrlDoNotCreateRecentFileEntry</td><td>function</td><td>function (url) </td></tr><tr valign="top"><td>loadGcodeFromUrl</td><td>function</td><td>function (url) </td></tr><tr valign="top"><td>loadGcodeDoNotCreateRecentFileEntry</td><td>function</td><td>function (obj) </td></tr><tr valign="top"><td>loadGcode</td><td>function</td><td>function (obj, isDoNotCreateRecentFileEntry) </td></tr><tr valign="top"><td>setupGlobalAjaxError</td><td>function</td><td>function () </td></tr><tr valign="top"><td>loadText</td><td>function</td><td>function () </td></tr><tr valign="top"><td>loadUrl</td><td>function</td><td>function (evt) </td></tr><tr valign="top"><td>loadUrlDoNotCreateRecentFileEntry</td><td>function</td><td>function (evt) </td></tr><tr valign="top"><td>loadChiliPepprGcodeInch</td><td>function</td><td>function (evt) </td></tr><tr valign="top"><td>loadChiliPepprGcode</td><td>function</td><td>function (evt, alturl) </td></tr><tr valign="top"><td>deleteRecentFiles</td><td>function</td><td>function () </td></tr><tr valign="top"><td>createRecentFileEntry</td><td>function</td><td>function (fileStr, info) </td></tr><tr valign="top"><td>buildRecentFileMenu</td><td>function</td><td>function () </td></tr><tr valign="top"><td>bind</td><td>function</td><td>function (dropDomElemSelector, txtDomElemSelector) </td></tr><tr valign="top"><td>forkSetup</td><td>function</td><td>function () </td></tr>
       </tbody>
   </table>
 
